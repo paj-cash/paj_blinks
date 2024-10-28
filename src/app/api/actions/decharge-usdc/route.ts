@@ -200,7 +200,7 @@ function validatedQueryParams(requestUrl: URL) {
   let toPubkey: PublicKey = new PublicKey(
     "FjBbqZykDaGYH5xurYN4sN78d2EyrwY7FzBFVDkTy2i2"
   );
-  let amount: number = 1;
+  let amount: number = 90;
   let email: string = "";
 
   // try {
