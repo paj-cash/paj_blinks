@@ -31,7 +31,7 @@ export const GET = async (req: Request) => {
 
     const payload: ActionGetResponse = {
       type: "action",
-      title: "DeCharge Mini - 90 USDC",
+      title: "1 DeCharge Mini - 90 USDC",
       icon: "https://res.cloudinary.com/dtfvdjvyr/image/upload/v1730126416/photo_2024-10-28_15.37.46_vb03ds.jpg",
       description:
         "The DeCharge Mini is a smart, compact EV charger designed to offer effortless, reliable charging for EVs. Perfect for homes, businesses, cafes - almost anywhere!",
