@@ -101,9 +101,10 @@ export const POST = async (req: Request) => {
           status: "PENDING",
           name: "Test User",
           country: "INDIA",
-          total_amount: "200",
+          total_amount: 200,
           total_amount_after_discount: 1,
           voucher_code: "",
+          is_sphere: false,
           // Update the comment to include email and wallet_id
           comment: `Purchase from DeCharge BLINK - Email: ${email}, Wallet ID: ${account.toString()}`,
         }),
@@ -200,7 +201,7 @@ function validatedQueryParams(requestUrl: URL) {
   let toPubkey: PublicKey = new PublicKey(
     "FjBbqZykDaGYH5xurYN4sN78d2EyrwY7FzBFVDkTy2i2"
   );
-  let amount: number = 90;
+  let amount: number = 1;
   let email: string = "";
 
   // try {
