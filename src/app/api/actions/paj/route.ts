@@ -12,11 +12,10 @@ import {
   Transaction,
 } from "@solana/web3.js";
 import * as splToken from "@solana/spl-token";
-import { NextResponse } from "next/server";
-import axios from "axios";
 
 const SOLANA_MAINNET_USDC_PUBKEY =
   "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
+
 const headers = createActionHeaders();
 
 export const GET = async (req: Request) => {
@@ -25,27 +24,38 @@ export const GET = async (req: Request) => {
     const { toPubkey } = validatedQueryParams(requestUrl);
 
     const baseHref = new URL(
-      `/api/actions/decharge-usdc?to=${toPubkey.toBase58()}`,
+      `/api/actions/donate-spl?to=${toPubkey.toBase58()}`,
       requestUrl.origin
     ).toString();
 
     const payload: ActionGetResponse = {
       type: "action",
-      title: "1 DeCharge Mini - 90 USDC",
-      icon: "https://res.cloudinary.com/dtfvdjvyr/image/upload/v1730126416/photo_2024-10-28_15.37.46_vb03ds.jpg",
-      description:
-        "The DeCharge Mini is a smart, compact EV charger designed to offer effortless, reliable charging for EVs. Perfect for homes, businesses, cafes - almost anywhere!",
-      label: "Buy for $90",
+      title: "Convert your USDC to fiat with paj",
+      icon: "https://res.cloudinary.com/dtfvdjvyr/image/upload/v1735811850/pajj_coku5v.png",
+      description: "Off ramp from your favourite wallet.",
+      label: "Donate", // this value will be ignored since `links.actions` exists
       links: {
         actions: [
           {
-            label: "Deploy Now",
-            href: `${baseHref}&amount=90&email={email}`,
+            label: "Off-ramp 10 USDC", // button text
+            href: `${baseHref}&amount=${"10"}`,
+          },
+          {
+            label: "Off-ramp 50 USDC", // button text
+            href: `${baseHref}&amount=${"50"}`,
+          },
+          {
+            label: "Off-ramp 100 USDC", // button text
+            href: `${baseHref}&amount=${"100"}`,
+          },
+          {
+            label: "Off ramp", // button text
+            href: `${baseHref}&amount={amount}`, // this href will have a text input
             parameters: [
               {
-                name: "email",
-                label: "Enter Email Address",
-                type: "email",
+                name: "amount", // parameter name in the `href` above
+                label: "Enter the amount of USDC to Off ramp", // placeholder of the text input
+                required: true,
               },
             ],
           },
@@ -67,15 +77,18 @@ export const GET = async (req: Request) => {
   }
 };
 
+// DO NOT FORGET TO INCLUDE THE `OPTIONS` HTTP METHOD
+// THIS WILL ENSURE CORS WORKS FOR BLINKS
 export const OPTIONS = GET;
 
 export const POST = async (req: Request) => {
   try {
     const requestUrl = new URL(req.url);
-    const { amount, toPubkey, email } = validatedQueryParams(requestUrl);
+    const { amount, toPubkey } = validatedQueryParams(requestUrl);
 
     const body: ActionPostRequest = await req.json();
 
+    // validate the client provided input
     let account: PublicKey;
     try {
       account = new PublicKey(body.account);
@@ -86,44 +99,11 @@ export const POST = async (req: Request) => {
       });
     }
 
-    // Send email and wallet data to API
-    try {
-      const response = await axios.post(
-        "https://rechrg.one/v1/ps/order/create",
-        JSON.stringify({
-          email: email,
-          wallet_id: "GeWJUMvrCWahZxy3JNyrHQ5CATxCscGB8J4xcFudPRFi",
-          transaction_id: "12345ABC",
-          purchase_quantity: 1,
-          amount: 1,
-          price: amount,
-          token: "SOL",
-          status: "PENDING",
-          name: "Test User",
-          country: "INDIA",
-          total_amount: 200,
-          total_amount_after_discount: 1,
-          voucher_code: "",
-          is_sphere: false,
-          // Update the comment to include email and wallet_id
-          comment: `Purchase from DeCharge BLINK - Email: ${email}, Wallet ID: ${account.toString()}`,
-        }),
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      console.log("Successfully sent to API");
-      console.log("Server response:", response.data); // Log the server response
-    } catch (error) {
-      console.error("Error sending data to API:", error);
-    }
-
     const connection = new Connection(clusterApiUrl("mainnet-beta"));
-    const decimals = 6;
-    const mintAddress = new PublicKey(SOLANA_MAINNET_USDC_PUBKEY);
+    const decimals = 6; // In the example, we use 6 decimals for USDC, but you can use any SPL token
+    const mintAddress = new PublicKey(SOLANA_MAINNET_USDC_PUBKEY); // replace this with any SPL token mint address
+
+    // converting value to fractional units
 
     let transferAmount: any = parseFloat(amount.toString());
     transferAmount = transferAmount.toFixed(decimals);
@@ -171,7 +151,12 @@ export const POST = async (req: Request) => {
 
     const transaction = new Transaction();
     transaction.feePayer = account;
+
     transaction.add(...instructions);
+
+    // set the end user as the fee payer
+    transaction.feePayer = account;
+
     transaction.recentBlockhash = (
       await connection.getLatestBlockhash()
     ).blockhash;
@@ -179,8 +164,10 @@ export const POST = async (req: Request) => {
     const payload: ActionPostResponse = await createPostResponse({
       fields: {
         transaction,
-        message: `Transaction created successfully`,
+        message: `Donated ${amount} USDC to ${toPubkey.toBase58()}`,
       },
+      // note: no additional signers are needed
+      // signers: [],
     });
 
     return Response.json(payload, {
@@ -199,33 +186,30 @@ export const POST = async (req: Request) => {
 
 function validatedQueryParams(requestUrl: URL) {
   let toPubkey: PublicKey = new PublicKey(
-    "FjBbqZykDaGYH5xurYN4sN78d2EyrwY7FzBFVDkTy2i2"
+    "PAJcXnAWYXmjuTUN1oumx43k4ZdTJH72KHPgVmq7sFS"
   );
-  let amount: number = 90;
-  let email: string = "";
-
-  // try {
-  //   if (requestUrl.searchParams.get("to")) {
-  //     toPubkey = new PublicKey(requestUrl.searchParams.get("to")!);
-  //   }
-  // } catch (err) {
-  //   throw "Invalid input query parameter: to";
-  // }
+  let amount: number = 10;
 
   try {
-    if (requestUrl.searchParams.get("email")) {
-      email = requestUrl.searchParams.get("email")!;
-      if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
-        throw "Invalid email format";
-      }
+    if (requestUrl.searchParams.get("to")) {
+      toPubkey = new PublicKey(requestUrl.searchParams.get("to")!);
     }
   } catch (err) {
-    throw "Invalid input query parameter: email";
+    throw "Invalid input query parameter: to";
+  }
+
+  try {
+    if (requestUrl.searchParams.get("amount")) {
+      amount = parseFloat(requestUrl.searchParams.get("amount")!);
+    }
+
+    if (amount <= 0) throw "amount is too small";
+  } catch (err) {
+    throw "Invalid input query parameter: amount";
   }
 
   return {
     amount,
     toPubkey,
-    email,
   };
 }
