@@ -31,7 +31,7 @@ export const GET = async (req: Request) => {
     const payload: ActionGetResponse = {
       type: "action",
       title: "Convert your USDC to fiat with paj",
-      icon: "https://res.cloudinary.com/dtfvdjvyr/image/upload/v1735811850/pajj_coku5v.png",
+      icon: "https://res.cloudinary.com/dtfvdjvyr/image/upload/v1737329552/Template_1_2_zwtffw.png",
       description: "Off ramp from your favourite wallet.",
       label: "Donate", // this value will be ignored since `links.actions` exists
       links: {
