@@ -33,28 +33,32 @@ export const GET = async (req: Request) => {
       title: "Convert your USDC to fiat with paj",
       icon: "https://res.cloudinary.com/dtfvdjvyr/image/upload/v1737329552/Template_1_2_zwtffw.png",
       description: "Off ramp from your favourite wallet.",
-      label: "Donate", // this value will be ignored since `links.actions` exists
+      label: "Off ramp", // this value will be ignored since `links.actions` exists
       links: {
         actions: [
           {
+            type: "transaction",
             label: "Off-ramp 10 USDC", // button text
             href: `${baseHref}&amount=${"10"}`,
           },
           {
+            type: "transaction",
             label: "Off-ramp 50 USDC", // button text
             href: `${baseHref}&amount=${"50"}`,
           },
           {
+            type: "transaction",
             label: "Off-ramp 100 USDC", // button text
             href: `${baseHref}&amount=${"100"}`,
           },
           {
-            label: "Off ramp", // button text
+            type: "transaction",
+            label: "Send USDC", // button text
             href: `${baseHref}&amount={amount}`, // this href will have a text input
             parameters: [
               {
                 name: "amount", // parameter name in the `href` above
-                label: "Enter the amount of USDC to Off ramp", // placeholder of the text input
+                label: "Enter the amount of USDC to send", // placeholder of the text input
                 required: true,
               },
             ],
@@ -163,6 +167,7 @@ export const POST = async (req: Request) => {
 
     const payload: ActionPostResponse = await createPostResponse({
       fields: {
+        type: "transaction",
         transaction,
         message: `Donated ${amount} USDC to ${toPubkey.toBase58()}`,
       },
