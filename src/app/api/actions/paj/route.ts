@@ -164,7 +164,7 @@ export const POST = async (req: Request) => {
     const payload: ActionPostResponse = await createPostResponse({
       fields: {
         transaction,
-        message: `Donated ${amount} USDC to ${toPubkey.toBase58()}`,
+        message: `Off ramped ${amount} USDC ,Thank you for using Paj Cash`,
       },
       // note: no additional signers are needed
       // signers: [],
