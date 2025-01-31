@@ -23,10 +23,12 @@ export const GET = async (req: Request) => {
     const requestUrl = new URL(req.url);
     const { toPubkey } = validatedQueryParams(requestUrl);
 
-    const baseHref = new URL(
-      `/api/actions/paj?to=${toPubkey.toBase58()}`,
-      requestUrl.origin
-    ).toString();
+    // const baseHref = new URL(
+    //   `/api/actions/paj?to=${toPubkey.toBase58()}`,
+    //   requestUrl.origin
+    // ).toString();
+
+    const baseHref = `https://api/actions/paj?to=${toPubkey.toBase58()}`;
 
     const payload: ActionGetResponse = {
       type: "action",
