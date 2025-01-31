@@ -28,7 +28,7 @@ export const GET = async (req: Request) => {
     //   requestUrl.origin
     // ).toString();
 
-    const baseHref = `https://api/actions/paj?to=${toPubkey.toBase58()}`;
+    const baseHref = `https://blinks.paj.cash/api/actions/paj?to=${toPubkey.toBase58()}`;
 
     const payload: ActionGetResponse = {
       type: "action",
