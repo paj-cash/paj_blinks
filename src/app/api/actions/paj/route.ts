@@ -24,7 +24,7 @@ export const GET = async (req: Request) => {
     const { toPubkey } = validatedQueryParams(requestUrl);
 
     const baseHref = new URL(
-      `/api/actions/donate-spl?to=${toPubkey.toBase58()}`,
+      `/api/actions/paj?to=${toPubkey.toBase58()}`,
       requestUrl.origin
     ).toString();
 
@@ -37,22 +37,18 @@ export const GET = async (req: Request) => {
       links: {
         actions: [
           {
-            type: "transaction",
             label: "Off-ramp 10 USDC", // button text
             href: `${baseHref}&amount=${"10"}`,
           },
           {
-            type: "transaction",
             label: "Off-ramp 50 USDC", // button text
             href: `${baseHref}&amount=${"50"}`,
           },
           {
-            type: "transaction",
             label: "Off-ramp 100 USDC", // button text
             href: `${baseHref}&amount=${"100"}`,
           },
           {
-            type: "transaction",
             label: "Send USDC", // button text
             href: `${baseHref}&amount={amount}`, // this href will have a text input
             parameters: [
@@ -167,7 +163,6 @@ export const POST = async (req: Request) => {
 
     const payload: ActionPostResponse = await createPostResponse({
       fields: {
-        type: "transaction",
         transaction,
         message: `Donated ${amount} USDC to ${toPubkey.toBase58()}`,
       },
